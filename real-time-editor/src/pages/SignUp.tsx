@@ -1,8 +1,10 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
 import reactLogo from '.././assets/react.svg'
-import { signInUser, signUpUser } from '../firebase/firebase'
+import { auth, db, signInUser, signUpUser } from '../firebase/firebase'
 import { Link, useNavigate } from 'react-router-dom'
 import '../App.css'
+import { User } from "firebase/auth";
+import { addDoc, collection, updateDoc, where, doc } from 'firebase/firestore'
 
 const defaultFormFields = {
   email: '',

@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import RequireAuth from "./components/require-auth";
 import SignUp from "./pages/SignUp";
+import "bootstrap/dist/css/bootstrap.css"
 
 function App() {
   const { currentUser } = useContext(AuthContext);
