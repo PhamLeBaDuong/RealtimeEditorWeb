@@ -3,7 +3,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "./App.css";
 import { getDoc,doc, collection } from "firebase/firestore";
-import { auth } from "../firebase/firebase";
+import { auth, getFileData } from "../firebase/firebase";
 
 const modules = {
     toolbar: [
@@ -21,9 +21,9 @@ const modules = {
     ],
 }
 
-function EditorPage(fileID: String) {
+function EditorPage(fileID: string) {
   const [value, setValue] = useState("");
-  setValue(doc(db,"users",auth.currentUser?.uid,"files",fileID))
+  getFileData(fileID).then((valuee) => setValue(valuee))
 
   return (
     <div className="container">

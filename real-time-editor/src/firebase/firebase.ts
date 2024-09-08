@@ -55,8 +55,9 @@ export const signUpUser = async (
 }
 
 export const getFileData = async (fileID: string) => {
-  doc(db,"users",auth.currentUser?.uid,"files",fileID)
-  where(doc(db,"users",auth.currentUser?.uid,"files",fileID),"==",fileID)
+  //doc(db,"users",auth.currentUser?.uid,"files",fileID)
+  return (await getDoc(doc(db,"users",auth.currentUser?.uid!,"files",fileID))).data.toString
+  //where(doc(db,"users",auth.currentUser?.uid,"files",fileID),"==",fileID)
 }
 
 // export const signInWithGoogle = async () => {
