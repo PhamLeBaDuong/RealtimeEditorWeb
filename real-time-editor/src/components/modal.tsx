@@ -23,22 +23,7 @@ const ModalComponent: React.FC<prop> = ({title,buttonTitle, handleOKK}:prop) => 
     setIsModalOpen(true);
   };
 
-  const handleOk = async () => {
-  //   const newFile = {
-  //       newFileName,
-  //       lastUpdate: Timestamp.now(),
-  //       createdAt: serverTimestamp(),
-  //       filedata,
-  //       //id: uuidv4()
-  //   }
-  //   try {
-  //     await addDoc(collectionRef,newFile);
-  //     const temp = files as Array<DocumentData>
-  //     temp.push(newFile)
-  // } catch (e) {
-  //     console.error(e)
-  // }
-    
+  const handleOk = async () => {    
     setIsModalOpen(false);
   };
 

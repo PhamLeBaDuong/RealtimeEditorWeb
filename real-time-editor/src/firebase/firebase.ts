@@ -16,11 +16,14 @@ import {collection,addDoc,Firestore,getFirestore,documentId,doc,where,FieldPath,
 import firebase from 'firebase/compat/app';
 //import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth/web-extension';
 import {v4 as uuidv4} from "uuid"
+import { getStorage, ref } from 'firebase/storage';
 
 const app = initializeApp(getFirebaseConfig());
 export const auth = getAuth(app);
 let userEmail = "";
 export const db = getFirestore(app);
+export const storage = getStorage(app);
+export const docimgRef = ref(storage,"docImage.png");
 let userID = "";
 
 export const signInUser = async (

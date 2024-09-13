@@ -83,3 +83,25 @@
 .signup-form button:hover {
     background-color: #27ae60;
 }
+
+.App {
+    margin-top: 4%;
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+.add-new-file {
+margin-left: 2%;
+}
+.file-list {
+gap: 4px;
+margin-left: 5%;
+}
+  
+.user-profile {    
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 4%;
+    margin-bottom: 4%;
+  } 
