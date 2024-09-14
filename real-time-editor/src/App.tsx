@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import RequireAuth from "./components/require-auth";
 import SignUp from "./pages/SignUp";
 import "bootstrap/dist/css/bootstrap.css"
+import EditorPage from "./pages/EditorPage";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -24,6 +25,7 @@ function App() {
   return (
     <Routes>
       <Route path="login" index element={<Login />} />
+      <Route path="editor-page" element={<EditorPage/>}/>
       <Route
         path="homepage"
         element={

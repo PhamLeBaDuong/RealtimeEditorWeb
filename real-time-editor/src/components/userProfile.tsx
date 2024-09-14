@@ -21,10 +21,10 @@ function UserProfile() {
         <div className='user-profile'>
           <div className='top-bar'></div>
           <div className='list-files'></div>
-          <div>
-            <h3>Welcome! {currentUser?.email}</h3>
-            <p>Sign In Status: {currentUser && 'active'}</p>
-            <Button onClick={handleSubmit}>Sign Out</Button>
+          <div style={{marginLeft: "auto", marginRight: "auto"}} className='profile'>
+            <h3 className='name'>Welcome! {currentUser?.email}</h3>
+            <p className='status'>Sign In Status: {currentUser && 'active'}</p>
+            <Button className='signoutbutton' onClick={handleSubmit}>Sign Out</Button>
           </div>
         </div>
       )

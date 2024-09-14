@@ -95,7 +95,11 @@ margin-left: 2%;
 }
 .file-list {
 gap: 4px;
-margin-left: 5%;
+margin-left: 10%;
+display: flex;
+}
+.fileName {
+
 }
   
 .user-profile {    
@@ -105,3 +109,15 @@ margin-left: 5%;
     margin-top: 4%;
     margin-bottom: 4%;
   } 
+  .user-profile div h3 {    
+      margin-left: auto;
+      margin-right: auto;
+  }
+  .user-profile div Button {    
+      margin-left: auto;
+      margin-right: auto;
+  }
+  .user-profile div p {    
+      margin-left: auto;
+      margin-right: auto;
+  }

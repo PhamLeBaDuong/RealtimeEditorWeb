@@ -9,6 +9,8 @@ import { Button, Input, Modal, Row,Image } from 'antd';
 import "../App.css"
 import { FileWordOutlined } from "@ant-design/icons";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
+import EditorPage from "../pages/EditorPage";
+import { useNavigate } from "react-router-dom";
 
 function ListFileItem () {
     const {currentUser} = useContext(AuthContext);
@@ -22,9 +24,11 @@ function ListFileItem () {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpenEditor, setIsModalOpenEditor] = useState(false);
     let [listID, setListID] = useState([] as Array<string>);
     const [img, setImg] = useState('');
     const [imgUrl, setImgUrl] = useState([] as Array<string>);
+    const navigate = useNavigate()
 
     
     // const q = query(collectionRef);
@@ -76,6 +80,17 @@ function ListFileItem () {
       const handleCancel = () => {
         setIsModalOpen(false);
       };
+      const showModalEditor = () => {
+          setIsModalOpenEditor(true);
+        };
+      
+        const handleOkEditor = async () => {
+          setIsModalOpenEditor(false);
+        };
+      
+        const handleCancelEditor = () => {
+          setIsModalOpenEditor(false);
+        };
 
 
     async function addFile(newFileName: string) {
@@ -90,6 +105,7 @@ function ListFileItem () {
         try {
             await addDoc(collectionRef,newFile);
             getDataa()
+            setNewFileName("");
             // const temp = files as Array<DocumentData>
             // temp.push(newFile)
             // setFiles(temp)
@@ -103,7 +119,7 @@ function ListFileItem () {
             {loading ? <h1>Loading...</h1> : null}
             <div className="add-new-file">                
                 <div className="addDocModal">
-                    <Button type="primary" onClick={showModal}>
+                    <Button onClick={showModal}>
                         Add new Document
                     </Button>
                     <Modal title="Enter new Document Title" open={isModalOpen} onOk={() => handleOk(newFileName)} onCancel={handleCancel}>
@@ -112,12 +128,14 @@ function ListFileItem () {
                 </div>
                 {/* <Button onClick={() => addFile()}>+</Button> */}
             </div>
-            <Row className="file-list" gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+            <Row style={{marginLeft: "3%"}} className="file-list" gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
                 {
                 (files as Array<DocumentData>).map((file, i) => 
-                    <div onClick={() => {}} className="file" key={i}>
-                        <Image src={imgUrl.at(0)} width={100} preview={false}/>
-                        <div className="fileName" >{file.fileName}</div>
+                    <div onClick={() => {
+                        navigate('/editor-page',{state: {fileID: listID[i]}})
+                    }} className="file" key={i}>
+                        <Image onClick={showModalEditor} src={imgUrl.at(0)} width={100} preview={false}/>
+                        <div className="fileName" style={{marginLeft: "auto",marginRight: "auto", display: "flex",justifyContent: "center"}}>{file.fileName}</div>
                         {/* <div>{(file.lastUpdate as Timestamp).toDate().getTime()}</div> */}
                         <div className="deleteButton">
                             <Button onClick={async () => {
