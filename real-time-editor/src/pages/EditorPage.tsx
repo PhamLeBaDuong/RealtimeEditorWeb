@@ -2,10 +2,14 @@ import { useContext, useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "../App.css";
-import { getDoc,doc, collection, onSnapshot, DocumentData, getDocFromCache, query, where, setDoc, updateDoc } from "firebase/firestore";
+import { doc, collection, onSnapshot, DocumentData, getDocFromCache, query, where, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db, getFileData } from "../firebase/firebase";
 import { AuthContext } from "../context/auth-context";
 import { useLocation } from "react-router-dom";
+import { FloatButton, Input, message, Modal } from 'antd';
+import { ShareAltOutlined } from "@ant-design/icons";
+import {fetchSignInMethodsForEmail} from "firebase/auth";
+import {getFunctions,httpsCallable} from "firebase/functions";
 
 const modules = {
     toolbar: [
@@ -22,25 +26,6 @@ const modules = {
         ["link", "image", "video"]
     ],
 }
-interface Props{
-  fileID: string
-}
-
-// useEffect(() => {
-//   const unsub = onSnapshot(collectionRef, (querySnapshot) => {
-//     const items = [] as Array<DocumentData>;
-//     querySnapshot.forEach((doc) => {
-//         items.push(doc.data());
-//         listID.push(doc.id);
-//         //console.log(listID[listID.length-1]);
-//     });
-//     setListID(listID);
-//     setFiles(items);
-//   });
-//   return () => {
-//       unsub();
-//   };
-// })
 
 
 function EditorPage() {
@@ -52,6 +37,19 @@ function EditorPage() {
   const [loading, setLoading] = useState(false);
   const {fileID} = state;
   const docRef = doc(db, "users", currentUserId,"files", fileID);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [emailShare, setEmailShare] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
+  const functions = getFunctions();
+  const getUserIdByEmail = httpsCallable(functions, 'getUserIdByEmail');
+  const fetchUserId = async (email: string) => {
+    try {
+      const result = await getUserIdByEmail({ email });
+      console.log("User ID:",result.data)
+    } catch (error) {
+      console.error("Error fetching user ID:", error);
+    }
+  };
   useEffect(() => {
     const unsub = onSnapshot(collectionRef,(querySnapshot) => {
       querySnapshot.forEach((docc) => {
@@ -63,12 +61,6 @@ function EditorPage() {
       })
     })
     return unsub
-    
-      // const docc = getDocFromCache(docRef).then(doccc => {
-      //   const docdata = doccc.data;
-      //   console.log(docdata)
-        
-      // });
 
   })
 
@@ -77,11 +69,40 @@ function EditorPage() {
     valuee = value
     await updateDoc(docRef,{filedata: value})
   }
+  const showModal = () => {
+      setIsModalOpen(true);
+    };
+  
+    const handleOk = (newEmail: string) => { 
+      fetchSignInMethodsForEmail(auth,newEmail).then(listMethod => {
+        if(listMethod.length == 0) {
+          messageApi.error("Email does not exist")
+        } 
+        else {          
+          try{
+            fetchUserId(newEmail).then(shareID => {
+              console.log(shareID)
+            })
+            setIsModalOpen(false);
+          } catch (e) {
+            console.error(e)
+          }
+        }
+      }).catch(e => {
+        messageApi.error("Invalid Email")
+        console.error(e)
+      })
+    };
+  
+    const handleCancel = () => {
+      setIsModalOpen(false);
+    };
 
 
 
   return (
     <div className="container">
+      {contextHolder}
       <div className="row">
         <div className="editor">
           <ReactQuill
@@ -93,6 +114,10 @@ function EditorPage() {
           />
         </div>
       </div>
+      <FloatButton icon={<ShareAltOutlined />} onClick={showModal}/>
+      <Modal title="Share File" open={isModalOpen} onOk={() => handleOk(emailShare)} onCancel={handleCancel}>
+          <Input value={emailShare} onChange={(e) => setEmailShare(e.target.value)} placeholder="Enter share email"/>
+      </Modal>
     </div>
   );
 }
