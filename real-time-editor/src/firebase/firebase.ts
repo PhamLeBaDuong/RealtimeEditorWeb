@@ -12,7 +12,7 @@ import {
 } from 'firebase/auth';
 import { getFirebaseConfig } from './firebase-config';
 
-import {collection,addDoc,Firestore,getFirestore,documentId,doc,where,FieldPath, getDoc} from "firebase/firestore";
+import {collection,addDoc,Firestore,getFirestore,documentId,doc,where,FieldPath, getDoc, setDoc} from "firebase/firestore";
 import firebase from 'firebase/compat/app';
 //import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth/web-extension';
 import {v4 as uuidv4} from "uuid"
@@ -54,6 +54,7 @@ export const signUpUser = async (
   password: string
 ) => {
   if (!email && !password) return;  
+  await setDoc(doc(db,"users",auth.currentUser?.uid!),{uid: auth.currentUser?.uid!, email: email})
   return await createUserWithEmailAndPassword(auth, email, password)
 }
 

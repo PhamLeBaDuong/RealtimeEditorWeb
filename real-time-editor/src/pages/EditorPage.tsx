@@ -44,12 +44,22 @@ function EditorPage() {
   const getUserIdByEmail = httpsCallable(functions, 'getUserIdByEmail');
   const fetchUserId = async (email: string) => {
     try {
-      const result = await getUserIdByEmail({ email });
-      console.log("User ID:",result.data)
+      const response = await fetch(`http://localhost:5173/getUserId?email=${email}`);
+      const data = await response.json();
+      console.log("User ID:", data.userId);
     } catch (error) {
       console.error("Error fetching user ID:", error);
     }
   };
+  // const fetchUserId = async (email: string) => {
+  //   try {
+  //     const result = await getUserIdByEmail({ email },);
+  //     console.log("User ID:",result.data)
+  //     return result.data
+  //   } catch (error) {
+  //     console.error("Error fetching user ID:", error);
+  //   }
+  // };
   useEffect(() => {
     const unsub = onSnapshot(collectionRef,(querySnapshot) => {
       querySnapshot.forEach((docc) => {
@@ -103,7 +113,7 @@ function EditorPage() {
   return (
     <div className="container">
       {contextHolder}
-      <div className="row">
+      <div style={{marginTop: "4%"}} className="row">
         <div className="editor">
           <ReactQuill
             className="editor-input"
