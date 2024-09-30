@@ -1,9 +1,10 @@
 
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useContext, useState } from 'react'
 import reactLogo from '.././assets/react.svg'
 import { signInUser } from '../firebase/firebase'
 import { Link, useNavigate } from 'react-router-dom'
 import '../App.css'
+import {AuthContext} from '../context/auth-contextPSQL'
 
 const defaultFormFields = {
   email: '',
@@ -11,6 +12,7 @@ const defaultFormFields = {
 }
 
 function Login() {
+  const {login} = useContext(AuthContext)!;
   const [formFields, setFormFields] = useState(defaultFormFields)
   const { email, password } = formFields
   const navigate = useNavigate()
@@ -25,13 +27,13 @@ function Login() {
     event.preventDefault()
 
     try {
-      // Send the email and password to firebase
-      const userCredential = await signInUser(email, password)
+      await login(email, password);
+      // const userCredential = await signInUser(email, password)
 
-      if (userCredential) {
-        resetFormFields()
-        navigate('/homepage')
-      }
+      // if (userCredential) {
+      //   resetFormFields()
+      //   navigate('/homepage')
+      // }
     } catch (error:any) {
       console.log('User Sign In Failed', error.message);
     }

@@ -1,19 +1,22 @@
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useContext, useState } from 'react'
 import reactLogo from '.././assets/react.svg'
 import { auth, db, signInUser, signUpUser } from '../firebase/firebase'
 import { Link, useNavigate } from 'react-router-dom'
 import '../App.css'
 import { User } from "firebase/auth";
 import { addDoc, collection, updateDoc, where, doc } from 'firebase/firestore'
+import {AuthContext} from "../context/auth-contextPSQL"
 
 const defaultFormFields = {
   email: '',
   password: '',
+  username: '',
 }
 
 function SignUp() {
+  const { register } = useContext(AuthContext)!;
   const [formFields, setFormFields] = useState(defaultFormFields)
-  const { email, password } = formFields
+  const { email, password, username } = formFields
   const navigate = useNavigate()
 
   const resetFormFields = () => {
@@ -26,13 +29,13 @@ function SignUp() {
     event.preventDefault()
 
     try {
-      // Send the email and password to firebase
-      const userCredential = await signUpUser(email, password)
+      await register(email, password, username);
+      // const userCredential = await signUpUser(email, password)
 
-      if (userCredential) {
-        resetFormFields()
-        navigate('/homepage')
-      }
+      // if (userCredential) {
+      //   resetFormFields()
+      //   navigate('/homepage')
+      // }
     } catch (error:any) {
       console.log('User Sign Up Failed', error.message);
     }
@@ -64,6 +67,16 @@ function SignUp() {
               value={password}
               onChange={handleChange}
               placeholder="Password"
+              required
+            />
+          </div>
+          <div>
+            <input
+              type='username'
+              name='username'
+              value={username}
+              onChange={handleChange}
+              placeholder="Username"
               required
             />
           </div>

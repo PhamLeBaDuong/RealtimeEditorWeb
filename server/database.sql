@@ -1,8 +1,9 @@
 CREATE DATABASE editorweb;
 
 CREATE TABLE users(
-    soccerfield_id SERIAL PRIMARY KEY,
-    username VARCHAR(50),
-    password VARCHAR(100),
-    email VARCHAR(50)
+    id BIGSERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    email VARCHAR(200) NOT NULL,
+    password VARCHAR(200) NOT NULL,
+    UNIQUE(email)
 );
