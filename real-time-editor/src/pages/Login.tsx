@@ -1,21 +1,28 @@
 
 import { ChangeEvent, FormEvent, useContext, useState } from 'react'
 import reactLogo from '.././assets/react.svg'
-import { signInUser } from '../firebase/firebase'
+// import { signInUser } from '../firebase/firebase'
 import { Link, useNavigate } from 'react-router-dom'
 import '../App.css'
 import {AuthContext} from '../context/auth-contextPSQL'
+import {toast} from "react-toastify"
 
 const defaultFormFields = {
   email: '',
   password: '',
 }
 
+type SetAuthType = (boool: boolean) => void;
+
+interface LoginProps {
+  setAuth: SetAuthType;
+}
+
 function Login() {
-  const {login} = useContext(AuthContext)!;
+  const {setAuthenticated} = useContext(AuthContext)!;
   const [formFields, setFormFields] = useState(defaultFormFields)
   const { email, password } = formFields
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
 
   const resetFormFields = () => {
     return (
@@ -26,8 +33,33 @@ function Login() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+
     try {
-      await login(email, password);
+      const body = { email, password };
+      const response = await fetch(
+        "http://localhost:5000/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify(body)
+        }
+      );
+
+      const parseRes = await response.json();
+
+      if (parseRes.jwtToken) {
+        localStorage.setItem("token", parseRes.jwtToken);
+        // setAuth(true);
+        setAuthenticated(true);
+        toast.success("Logged in Successfully");
+      } else {
+        // setAuth(false);
+        setAuthenticated(false);
+        toast.error(parseRes);
+      }
+      // await login(email, password);
       // const userCredential = await signInUser(email, password)
 
       // if (userCredential) {

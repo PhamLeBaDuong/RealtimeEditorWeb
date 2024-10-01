@@ -1,71 +1,40 @@
 // src/context/AuthContext.tsx
-import React, { createContext, useState, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
-// import {UserInfo} from "./user-model";
-
-interface User {
-    id: string,
-    name: string,
-    email: string,
-}
+import React, { createContext, useState, ReactNode, useEffect } from "react";
 
 interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  isAuthenticated: boolean;
+  setAuthenticated: (value: boolean) => void;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-);
+export const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  setAuthenticated: () => {}, // Default empty function
+});
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const navigate = useNavigate();
+export const AuthProvider = ({ children }: { children?: ReactNode }) => {
+  const [isAuthenticated, setAuthenticated] = useState<boolean>(() => {
+    // Get initial value from localStorage on component mount
+    const storedAuth = localStorage.getItem("isAuthenticated");
+    return storedAuth ? JSON.parse(storedAuth) : false;
+  })
 
-  const login = async (email: string, password: string) => {
-    try {
-      const body = { email, password };
-      const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      setUser(await response.json());
-      navigate("/homepage");
-    } catch (error) {
-      console.error("Login error", error);
-    }
-  };
-
-  const register = async (username: string, email: string, password: string) => {
-    try {
-        const body = {email, username, password}
-      const response = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(body),
-        credentials: "include" 
-      });
-      setUser(await response.json());
-      navigate("/homepage");
-    } catch (error) {
-      console.error("Registration error", error);
-    }
-  };
-
-  const logout = () => {
-    setUser(null);
-    navigate("/");
-  };
+  useEffect(() => {
+    //Update localStorage whenever isAuthenticated changes
+    localStorage.setItem("isAuthenticated", JSON.stringify(isAuthenticated));
+  },[isAuthenticated])
+  // useEffect(() => {
+  //   const unsubscribe = userStateListener((user) => {
+  //     if (user) {
+  //       setCurrentUser(user)
+  //     }
+  //   });
+  //   return unsubscribe
+  // }, [setCurrentUser]);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated,setAuthenticated}}>
       {children}
     </AuthContext.Provider>
   );
 };
+

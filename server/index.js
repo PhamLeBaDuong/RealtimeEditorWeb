@@ -21,16 +21,16 @@ app.use("/auth", require("./routes/editorWebAuth"))
 app.use("/homepage", require("./routes/homepage"))
 
 
-app.post("/editorweb", async (req, res) => {
-    try {
-        const {description} = req.body;
-        const newField = await pool.query("INSERT INTO soccerfield (description) VALUES($1) RETURNING *", [description]);
+// app.post("/editorweb", async (req, res) => {
+//     try {
+//         const {description} = req.body;
+//         const newField = await pool.query("INSERT INTO soccerfield (description) VALUES($1) RETURNING *", [description]);
 
-        res.json(newField.rows[0]);
-    } catch (error) {
-        console.log(error.message);
-    }
-})
+//         res.json(newField.rows[0]);
+//     } catch (error) {
+//         console.log(error.message);
+//     }
+// })
 
 
 

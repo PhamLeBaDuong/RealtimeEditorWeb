@@ -1,10 +1,15 @@
 
 import { useContext } from 'react'
-import { AuthContext } from '../context/auth-context'
+// import { AuthContext } from '../context/auth-context'
 import ListFileItem from '../components/listFileItem'
 import { Navigate, useNavigate, useNavigation } from 'react-router-dom'
 import UserProfile from '../components/userProfile';
 
+type SetAuthType = (boool: boolean) => void;
+
+interface HomepageProps {
+  setAuth: SetAuthType;
+}
 function HomePage() {
   // const { currentUser, signOut } = useContext(AuthContext);
   // const navigate = useNavigate()
@@ -28,7 +33,7 @@ function HomePage() {
         <button onClick={handleSubmit}>Sign Out</button>
       </div> */}
       <UserProfile/>
-      <ListFileItem/>
+      {/* <ListFileItem/> */}
       </>
   )
 }

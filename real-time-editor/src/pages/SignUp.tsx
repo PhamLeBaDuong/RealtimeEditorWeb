@@ -1,22 +1,29 @@
 import { ChangeEvent, FormEvent, useContext, useState } from 'react'
 import reactLogo from '.././assets/react.svg'
-import { auth, db, signInUser, signUpUser } from '../firebase/firebase'
+// import { auth, db, signInUser, signUpUser } from '../firebase/firebase'
 import { Link, useNavigate } from 'react-router-dom'
 import '../App.css'
-import { User } from "firebase/auth";
-import { addDoc, collection, updateDoc, where, doc } from 'firebase/firestore'
+// import { User } from "firebase/auth";
+// import { addDoc, collection, updateDoc, where, doc } from 'firebase/firestore'
 import {AuthContext} from "../context/auth-contextPSQL"
+import { toast } from 'react-toastify'
 
 const defaultFormFields = {
   email: '',
   password: '',
-  username: '',
+  name: '',
+}
+
+type SetAuthType = (boool: boolean) => void;
+
+interface SignUpProps {
+  setAuth: SetAuthType;
 }
 
 function SignUp() {
-  const { register } = useContext(AuthContext)!;
+  const { setAuthenticated } = useContext(AuthContext)!;
   const [formFields, setFormFields] = useState(defaultFormFields)
-  const { email, password, username } = formFields
+  const { email, password, name } = formFields
   const navigate = useNavigate()
 
   const resetFormFields = () => {
@@ -29,7 +36,30 @@ function SignUp() {
     event.preventDefault()
 
     try {
-      await register(email, password, username);
+      const body = { email, password, name };
+      const response = await fetch(
+        "http://localhost:5000/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify(body)
+        }
+      );
+      const parseRes = await response.json();
+
+      if (parseRes.jwtToken) {
+        localStorage.setItem("token", parseRes.jwtToken);
+        // setAuth(true);
+        setAuthenticated(true);
+        toast.success("Register Successfully");
+      } else {
+        // setAuth(false);
+        setAuthenticated(false);
+        toast.error(parseRes);
+      }
+      // await register(email, password, username);
       // const userCredential = await signUpUser(email, password)
 
       // if (userCredential) {
@@ -73,8 +103,8 @@ function SignUp() {
           <div>
             <input
               type='username'
-              name='username'
-              value={username}
+              name='name'
+              value={name}
               onChange={handleChange}
               placeholder="Username"
               required

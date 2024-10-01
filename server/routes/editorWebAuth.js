@@ -27,9 +27,9 @@ router.post("/login", validInfo, async (req, res) => {
             return res.status(400).json({message : "Invalid Credentials"});
         }
 
-        const token = jwt.sign({userId : user.id}, process.env.SECRET_KEY, {expiresIn : "1h"});
+        const jwtToken = jwt.sign({user : {id : user.id}}, process.env.SECRET_KEY, {expiresIn : "1h"});
 
-        res.json({token});
+        return res.json({jwtToken});
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Server error");
@@ -50,9 +50,9 @@ router.post("/register", validInfo, async (req, res) => {
         const bcryptPassword = await bcrypt.hash(password, salt);
         const result = await pool.query("INSERT INTO users (email, password, name) VALUES($1, $2, $3) RETURNING *", [email, bcryptPassword, name]);
         
-        const token = jwt.sign({userId : result.rows[0].id}, process.env.SECRET_KEY, {expiresIn : "1h"});
+        const jwtToken = jwt.sign({user : {id: result.rows[0].id}}, process.env.SECRET_KEY, {expiresIn : "1h"});
 
-        res.status(201).json({token});
+        return res.status(201).json({jwtToken});
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Server error");
@@ -61,32 +61,32 @@ router.post("/register", validInfo, async (req, res) => {
 
 // Token verification
 
-function verifyToken(req, res, next) {
-    const token = res.headers.authorization && req.headers.authorization.split(" ")[1];
+// function verifyToken(req, res, next) {
+//     const token = res.headers.authorization && req.headers.authorization.split(" ")[1];
 
-    if (!token) {
-        return res.status(401).json({message : "Missing token"});
-    }
+//     if (!token) {
+//         return res.status(401).json({message : "Missing token"});
+//     }
 
-    try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        console.log(error.message);
-        res.status(401).json({message : "Invalid token"});
-    }
-}
+//     try {
+//         const decoded = jwt.verify(token, process.env.SECRET_KEY);
+//         req.user = decoded;
+//         next();
+//     } catch (error) {
+//         console.log(error.message);
+//         res.status(401).json({message : "Invalid token"});
+//     }
+// }
 
-router.get("/", verifyToken, async (req, res) => {
-    try {
-        const user = await pool.query("SELECT * FROM users WHERE id = $1", [req.user.userId]);
-        res.json(user.rows[0]);
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Server error");
-    }
-})
+// router.get("/", verifyToken, async (req, res) => {
+//     try {
+//         const user = await pool.query("SELECT * FROM users WHERE id = $1", [req.user.id]);
+//         res.json(user.rows[0]);
+//     } catch (error) {
+//         console.log(error.message);
+//         res.status(500).send("Server error");
+//     }
+// })
 
 router.get("/is-verify",authorization,async (req, res) => {
     try {
