@@ -81,6 +81,19 @@ app.use("/homepage", require("./routes/homepage"))
 //         console.log(error.message);
 //     }
 // })
+
+const io = require("socket.io")(5001, {
+    cors: {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"]
+    }
+})
+
+io.on("connection", socket => {
+    socket.on("send-changes", delta => {
+        socket.broadcast.emit("receive-changes", delta)
+    })
+})
  
 app.listen(5000, () => {
     console.log("ser has started on port 5000");

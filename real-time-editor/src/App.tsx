@@ -17,46 +17,13 @@ import EditorPage from "./pages/EditorPage";
 import { JSX } from "react/jsx-runtime";
 
 function App() {
-  const { isAuthenticated,setAuthenticated } = useContext(AuthContext);
+  // const { isAuthenticated,setAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
-  // const [isAuthenticated, setIsAuthetnicated] = useState(false);
-  // const setAuth = (boool: boolean) => {
-  //   setIsAuthetnicated(boool);
-  // };
-
-  // // NOTE: console log for testing purposes
-  // console.log("User:", !!currentUser);
-
-  // // Check if the current user exists on the initial render.
-  // useEffect(() => {
-  //   if (currentUser) {
-  //     navigate("/homepage");
-  //   }
-  // }, [currentUser]);
 
   return (
-    // <Routes>
-    //   <Route path="login" index element={<Login />} />
-    //   <Route path="editor-page" element={<EditorPage/>}/>
-    //   <Route
-    //     path="homepage"
-    //     element={
-    //       <RequireAuth>
-    //         <HomePage />
-    //       </RequireAuth>
-    //     }
-    //   />
-    //   <Route
-    //     path="signup"
-    //     element={
-    //       <SignUp />
-    //     }
-    //   />
-    // </Routes>
-
     <Fragment>
-      {/* <Router> */}
-        <div className="routes">
+      <EditorPage/>
+        {/* <div className="routes">
           <Routes>
             <Route
               path="/login"
@@ -88,28 +55,8 @@ function App() {
                 )
               }
             />
-            {/* <Route
-              path="/login"
-              loader={(props) =>
-                !isAuthenticated ? <Login /> : redirect("/homepage")
-              }
-            />
-            <Route path="/editor-page" element={<EditorPage />} />
-            <Route
-              path="/homepage"
-              loader={(props) =>
-                !isAuthenticated ? <HomePage /> : redirect("/login")
-              }
-            />
-            <Route
-              path="/signup"
-              loader={(props) =>
-                !isAuthenticated ? <SignUp /> : redirect("/homepage")
-              }
-            /> */}
           </Routes>
-        </div>
-      {/* </Router> */}
+        </div> */}
     </Fragment>
   );
 }
