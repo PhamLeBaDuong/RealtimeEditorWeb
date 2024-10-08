@@ -8,12 +8,13 @@ import Quill from "quill"
 // import { doc, collection, onSnapshot, DocumentData, getDocFromCache, query, where, setDoc, updateDoc } from "firebase/firestore";
 // import { auth, db, getFileData } from "../firebase/firebase";
 import { AuthContext } from "../context/auth-context";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { FloatButton, Input, message, Modal } from 'antd';
 import { ShareAltOutlined } from "@ant-design/icons";
 import { Delta } from "quill/core";
 // import {fetchSignInMethodsForEmail} from "firebase/auth";
 // import {getFunctions,httpsCallable} from "firebase/functions";
+const SAVE_INTERVAL_MS = 2000;
 const modules = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ font: [] }],
@@ -30,14 +31,8 @@ const modules = [
 function EditorPage() {
   const [quill, setQuill] = useState<Quill>(null as any)
   const [socket, setSocket] = useState<Socket<any, any> | null>(null);
-  useEffect(() => {
-    const s = io("http://localhost:5001");
-    setSocket(s);
-
-    return () => {
-      s.disconnect()
-    }
-  },[])
+  const {id: fileID} = useParams();
+  console.log(fileID);
   // const {currentUser} = useContext(AuthContext);
   // const currentUserId = currentUser!.uid;
   // const collectionRef = collection(db,"users",currentUserId,"files");
@@ -49,6 +44,14 @@ function EditorPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [emailShare, setEmailShare] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
+  useEffect(() => {
+    const s = io("http://localhost:5001");
+    setSocket(s);
+
+    return () => {
+      s.disconnect()
+    }
+  },[])
   // const functions = getFunctions();
   // const getUserIdByEmail = httpsCallable(functions, 'getUserIdByEmail');
   // const fetchUserId = async (email: string) => {
@@ -119,6 +122,25 @@ function EditorPage() {
     };
     useEffect(() => {
       if (socket == null || quill == null) return
+
+      const interval = setInterval(() => {
+        socket.emit("save-document", quill.getContents())
+      }, SAVE_INTERVAL_MS)
+  
+      return () => {
+        clearInterval(interval)
+      }
+    }, [socket, quill])
+    useEffect(() => {
+      if (socket == null || quill == null) return
+      socket.once("load-document", (document: Delta) => {
+        quill.setContents(document)
+        quill.enable()
+      })
+      socket.emit("get-document",fileID)
+    }, [socket, quill, fileID])
+    useEffect(() => {
+      if (socket == null || quill == null) return
   
       const handler = (delta: Delta) => {
         quill.updateContents(delta)
@@ -152,8 +174,8 @@ function EditorPage() {
         theme: "snow",
         modules: { toolbar: modules },
       })
-      // q.disable()
-      // q.setText("Loading...")
+      q.disable()
+      q.setText("Loading...")
       setQuill(q)
     }, [])
 

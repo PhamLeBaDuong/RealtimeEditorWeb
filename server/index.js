@@ -5,6 +5,15 @@ const pool = require('./db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const Document = require('./document');
+
+const defaultDocumentData = "";
+
+mongoose.connect("mongodb://localhost:27017/test").then(() => {
+    console.log('Connected!');
+  })
+
 
 dotenv.config();
 
@@ -90,10 +99,27 @@ const io = require("socket.io")(5001, {
 })
 
 io.on("connection", socket => {
-    socket.on("send-changes", delta => {
-        socket.broadcast.emit("receive-changes", delta)
+    socket.on("get-document", async fileID => {
+        const document = await findOrCreateDocument(fileID);
+        socket.join(fileID)
+        socket.emit("load-document", document.data ) 
+        socket.on("send-changes", delta => {
+            socket.broadcast.to(fileID).emit("receive-changes", delta)
+        })
+        socket.on("save-document", async data => {
+            await Document.findByIdAndUpdate(fileID, {data})
+        })
     })
 })
+
+async function findOrCreateDocument(id) {
+    if(id == null) return 
+
+    const document = await Document.findById(id)
+    if(document) return document
+    return await Document.create({_id: id, data: defaultDocumentData})
+
+}
  
 app.listen(5000, () => {
     console.log("ser has started on port 5000");

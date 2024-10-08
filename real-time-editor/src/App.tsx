@@ -4,7 +4,7 @@ import {
   Routes,
   Route,
   useNavigate,
-  redirect,
+  generatePath,
   Navigate,
 } from "react-router-dom";
 import { AuthContext } from "./context/auth-contextPSQL";
@@ -15,6 +15,8 @@ import SignUp from "./pages/SignUp";
 import "bootstrap/dist/css/bootstrap.css";
 import EditorPage from "./pages/EditorPage";
 import { JSX } from "react/jsx-runtime";
+import { v4 as uuidv4 } from 'uuid';
+
 
 function App() {
   // const { isAuthenticated,setAuthenticated } = useContext(AuthContext);
@@ -22,7 +24,15 @@ function App() {
 
   return (
     <Fragment>
-      <EditorPage/>
+      <Routes>
+        <Route path="/" element ={
+          <Navigate to={generatePath('/document/:id',{id:uuidv4()})} replace/>
+        } />
+        <Route path="/document/:id" element ={
+          <EditorPage/>
+        }/> 
+      </Routes>
+      {/* <EditorPage/> */}
         {/* <div className="routes">
           <Routes>
             <Route
