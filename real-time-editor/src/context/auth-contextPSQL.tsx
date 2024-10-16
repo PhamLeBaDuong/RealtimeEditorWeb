@@ -4,11 +4,15 @@ import React, { createContext, useState, ReactNode, useEffect } from "react";
 interface AuthContextType {
   isAuthenticated: boolean;
   setAuthenticated: (value: boolean) => void;
+  setUid: (value: Number) => void;
+  uid: Number;
 }
 
 export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
-  setAuthenticated: () => {}, // Default empty function
+  setAuthenticated: () => {}, // Default empty function,
+  uid: Number(0),
+  setUid: () => {}
 });
 
 export const AuthProvider = ({ children }: { children?: ReactNode }) => {
@@ -18,10 +22,17 @@ export const AuthProvider = ({ children }: { children?: ReactNode }) => {
     return storedAuth ? JSON.parse(storedAuth) : false;
   })
 
+  const [uid, setUid] = useState<Number>(() => {
+    const storeUid = localStorage.getItem("uid");
+    return storeUid !== null ? Number(storeUid) : Number(0);
+  })
+
   useEffect(() => {
     //Update localStorage whenever isAuthenticated changes
     localStorage.setItem("isAuthenticated", JSON.stringify(isAuthenticated));
-  },[isAuthenticated])
+    localStorage.setItem("uid", uid.toString());
+    console.log(uid.toString());
+  },[isAuthenticated, uid])
   // useEffect(() => {
   //   const unsubscribe = userStateListener((user) => {
   //     if (user) {
@@ -32,7 +43,7 @@ export const AuthProvider = ({ children }: { children?: ReactNode }) => {
   // }, [setCurrentUser]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated,setAuthenticated}}>
+    <AuthContext.Provider value={{ isAuthenticated,setAuthenticated, uid, setUid}}>
       {children}
     </AuthContext.Provider>
   );

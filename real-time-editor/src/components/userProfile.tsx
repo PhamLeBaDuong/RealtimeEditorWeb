@@ -4,7 +4,7 @@ import { AuthContext } from '../context/auth-contextPSQL'
 import { Navigate, useNavigate, useNavigation } from 'react-router-dom'
 import { Button } from 'antd';
 import "bootstrap/dist/css/bootstrap.css"
-import "../App.css"
+// import "../App.css"
 import { toast } from 'react-toastify';
 type SetAuthType = (boool: boolean) => void;
 
@@ -12,7 +12,7 @@ interface UserProfileProps {
   setAuth: SetAuthType;
 }
 function UserProfile() {
-  const { setAuthenticated} = useContext(AuthContext);
+  const { setAuthenticated, setUid} = useContext(AuthContext);
   // const { user,logout } = useContext(AuthContext)!;
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -27,6 +27,8 @@ function UserProfile() {
       const parseData = await res.json();
       setName(parseData.name);
       setEmail(parseData.email);
+      setUid(Number(parseData.id));
+      console.log(parseData);
     } catch (err) {
       console.error(err);
     }
@@ -53,14 +55,13 @@ function UserProfile() {
       * Extract the currrentUser from the context, if you want to
       * get the User info, like the email, display name, etc.
       */
-      <div className='user-profile container mt-5'>
+      <div className='user-profile mt-2  text-center'>
         <div className='top-bar'></div>
         <div className='list-files'></div>
-        <div style={{marginLeft: "auto", marginRight: "auto"}} className='profile'>
-        {/* <h3 className='name'>Welcome! {currentUser?.email}</h3> */}
-        <h3 className='name text-center'>Welcome! {name}</h3>
-          <p className='status text-center'>Sign In Status: {email + ' && active'}</p>
-          <button className='btn' onClick={logout}>Sign Out</button>
+        <div className='profile'>
+        <h3 className='name'>Welcome! {name}</h3>
+          <p className='status '>Sign In Status: {email + ' && active'}</p>
+          <button className='button' onClick={logout}>Sign Out</button>
         </div>
       </div>
     )

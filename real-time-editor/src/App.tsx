@@ -19,21 +19,17 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 function App() {
-  // const { isAuthenticated,setAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated,setAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
 
   return (
     <Fragment>
-      <Routes>
+      {/* <Routes>
         <Route path="/" element ={
           <Navigate to={generatePath('/document/:id',{id:uuidv4()})} replace/>
         } />
-        <Route path="/document/:id" element ={
-          <EditorPage/>
-        }/> 
-      </Routes>
-      {/* <EditorPage/> */}
-        {/* <div className="routes">
+      </Routes> */}
+        <div className="routes">
           <Routes>
             <Route
               path="/login"
@@ -65,8 +61,11 @@ function App() {
                 )
               }
             />
+            <Route path="/document/:id" element ={
+              <EditorPage/>
+            }/> 
           </Routes>
-        </div> */}
+        </div>
     </Fragment>
   );
 }

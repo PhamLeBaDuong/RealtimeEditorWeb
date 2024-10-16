@@ -9,7 +9,7 @@ CREATE TABLE users(
 );
 
 CREATE TABLE documents (
-    id BIGSERIAL PRIMARY KEY NOT NULL,
+    id UUID PRIMARY KEY NOT NULL,
     title VARCHAR(255) NOT NULL,
     owner_id BIGSERIAL REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),

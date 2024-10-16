@@ -1,26 +1,27 @@
-import {collection,addDoc,Firestore,Timestamp, onSnapshot, QueryDocumentSnapshot, DocumentData, serverTimestamp, doc, setDoc, deleteDoc, getDoc, getDocs} from "firebase/firestore";
-import {auth, db, storage} from '../firebase/firebase'
+// import {collection,addDoc,Firestore,Timestamp, onSnapshot, QueryDocumentSnapshot, DocumentData, serverTimestamp, doc, setDoc, deleteDoc, getDoc, getDocs} from "firebase/firestore";
+// import {auth, db, storage} from '../firebase/firebase'
 import { MouseEventHandler,MouseEvent,useContext, useState, useEffect, Fragment } from "react";
-import { AuthContext } from "../context/auth-context";
-// import {v4 as uuidv4} from "uuid";
+import { AuthContext } from "../context/auth-contextPSQL";
+import {v4 as uuidv4} from "uuid";
 // import Model from "./modal";
 // import ModalComponent from "./modal";
 import { Button, Input, Modal, Row,Image } from 'antd';
 import "../App.css"
 import { FileWordOutlined } from "@ant-design/icons";
-import { getDownloadURL, listAll, ref } from "firebase/storage";
+// import { getDownloadURL, listAll, ref } from "firebase/storage";
 import EditorPage from "../pages/EditorPage";
 import { useNavigate } from "react-router-dom";
+import { Timestamp } from "firebase/firestore";
 
 function ListFileItem () {
-    const {currentUser} = useContext(AuthContext);
-    const currentUserId = currentUser!.uid;
-    const collectionRef = collection(db,"users",currentUserId,"files");
+    const {uid} = useContext(AuthContext);
+    // const currentUserId = currentUser!.uid;
+    // const collectionRef = collection(db,"users",currentUserId,"files");
     const [loading, setLoading] = useState(false);
     const [fileName, setFileName] = useState("");
     const [filedata, setFileData] = useState("");
     const [newFileName, setNewFileName] = useState("");
-    const [files, setFiles] = useState([] as Array< DocumentData>);
+    // const [files, setFiles] = useState([] as Array< DocumentData>);
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,37 +37,38 @@ function ListFileItem () {
 
     useEffect(() => {
         getDataa()
-        getDocImage()
+        // getDocImage()
     },[]);
     // const getData = () => {  
     // }
-    function getDocImage() {
-        listAll(ref(storage,"docImageFolder/")).then(imgs=> {
-            imgs.items.forEach(val => {
-                getDownloadURL(val).then(url => {
-                    setImgUrl(data=>[...data,url])
-                })
-            })
-        })
-    }
+    // function getDocImage() {
+    //     listAll(ref(storage,"docImageFolder/")).then(imgs=> {
+    //         imgs.items.forEach(val => {
+    //             getDownloadURL(val).then(url => {
+    //                 setImgUrl(data=>[...data,url])
+    //             })
+    //         })
+    //     })
+    // }
     function getDataa() {  
         //setListID([] as Array<string>);
-        listID = [];
-        setLoading(true);
-        const unsub = onSnapshot(collectionRef, (querySnapshot) => {
-            const items = [] as Array<DocumentData>;
-            querySnapshot.forEach((doc) => {
-                items.push(doc.data());
-                listID.push(doc.id);
-                //console.log(listID[listID.length-1]);
-            });
-            setListID(listID);
-            setFiles(items);
-            setLoading(false);
-        });
-        return () => {
-            unsub();
-        };
+
+        // listID = [];
+        // setLoading(true);
+        // const unsub = onSnapshot(collectionRef, (querySnapshot) => {
+        //     const items = [] as Array<DocumentData>;
+        //     querySnapshot.forEach((doc) => {
+        //         items.push(doc.data());
+        //         listID.push(doc.id);
+        //         //console.log(listID[listID.length-1]);
+        //     });
+        //     setListID(listID);
+        //     setFiles(items);
+        //     setLoading(false);
+        // });
+        // return () => {
+        //     unsub();
+        // };
     }
     const showModal = () => {
         setIsModalOpen(true);
@@ -93,31 +95,43 @@ function ListFileItem () {
         };
 
 
-    async function addFile(newFileName: string) {
-        const newFile = {
-            fileName: newFileName,
-            lastUpdate: Timestamp.now(),
-            createdAt: serverTimestamp(),
-            filedata,
-            //id: uuidv4()
+    async function addFile(newFileTitle: string) {
+        const body = {
+            user_id: uid,
+            document_id: uuidv4(),
+            document_title: "New Title",
+            created_at: Timestamp.now(),
+            updated_at: Timestamp.now()
         }
-
         try {
-            await addDoc(collectionRef,newFile);
-            getDataa()
-            setNewFileName("");
-            // const temp = files as Array<DocumentData>
-            // temp.push(newFile)
-            // setFiles(temp)
-        } catch (e) {
-            console.error(e)
+          const res = await fetch("http://localhost:5000/homepage/add-file", {
+            method: "POST",
+            headers: { jwt_token: localStorage.token },
+            body: JSON.stringify(body)
+          });
+    
+          const parseData = await res.json();
+          console.log(parseData);
+        } catch (err) {
+          console.error(err);
         }
+        // try {
+        //     // await addDoc(collectionRef,newFile);
+        //     // getDataa()
+        //     // setNewFileName("");
+
+        //     // const temp = files as Array<DocumentData>
+        //     // temp.push(newFile)
+        //     // setFiles(temp)
+        // } catch (e) {
+        //     console.error(e)
+        // }
     }
 
     return (
         <Fragment>
             {loading ? <h1>Loading...</h1> : null}
-            <div className="add-new-file">                
+            <div className="add-new-file">
                 <div className="addDocModal">
                     <Button onClick={showModal}>
                         Add new Document
@@ -130,31 +144,32 @@ function ListFileItem () {
             </div>
             <Row style={{marginLeft: "3%"}} className="file-list" gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
                 {
-                (files as Array<DocumentData>).map((file, i) => 
-                    <div onClick={() => {
-                        navigate('/editor-page',{state: {fileID: listID[i]}})
-                    }} className="file" key={i}>
-                        <Image onClick={showModalEditor} src={imgUrl.at(0)} width={100} preview={false}/>
-                        <div className="fileName" style={{marginLeft: "auto",marginRight: "auto", display: "flex",justifyContent: "center"}}>{file.fileName}</div>
-                        {/* <div>{(file.lastUpdate as Timestamp).toDate().getTime()}</div> */}
-                        <div className="deleteButton">
-                            <Button onClick={async () => {
-                                try {
-                                    const fileref = doc(db,"users",auth.currentUser?.uid!,"files",listID[i])
-                                    await deleteDoc(fileref)
-                                    console.log(listID[i])
-                                } catch (e) {
-                                    console.error(e)
-                                }
-                            }} block>x</Button>
-                        </div>
-                        {/* <div className="editButton">
-                            <Button onClick={() => {
-                                console.log(listID[i])
-                            }}>edit</Button>
-                        </div> */}
-                    </div>
-                )}
+                // (files as Array<DocumentData>).map((file, i) => 
+                //     <div onClick={() => {
+                //         navigate('/editor-page',{state: {fileID: listID[i]}})
+                //     }} className="file" key={i}>
+                //         <Image onClick={showModalEditor} src={imgUrl.at(0)} width={100} preview={false}/>
+                //         <div className="fileName" style={{marginLeft: "auto",marginRight: "auto", display: "flex",justifyContent: "center"}}>{file.fileName}</div>
+                //         {/* <div>{(file.lastUpdate as Timestamp).toDate().getTime()}</div> */}
+                //         <div className="deleteButton">
+                //             <Button onClick={async () => {
+                //                 try {
+                //                     const fileref = doc(db,"users",auth.currentUser?.uid!,"files",listID[i])
+                //                     await deleteDoc(fileref)
+                //                     console.log(listID[i])
+                //                 } catch (e) {
+                //                     console.error(e)
+                //                 }
+                //             }} block>x</Button>
+                //         </div>
+                //         {/* <div className="editButton">
+                //             <Button onClick={() => {
+                //                 console.log(listID[i])
+                //             }}>edit</Button>
+                //         </div> */}
+                //     </div>
+                // )
+                }
             </Row>
             <div>
             </div>            

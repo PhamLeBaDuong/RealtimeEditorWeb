@@ -182,7 +182,7 @@ function EditorPage() {
 
 
   return (
-    <div className="containerr">
+    <div className="container">
       <div className="wrapper" ref={wrapperRef} />
       {/* {contextHolder}
       <div style={{marginTop: "4%"}} className="row">

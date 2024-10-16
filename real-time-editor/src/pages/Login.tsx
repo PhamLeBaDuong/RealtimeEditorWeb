@@ -19,7 +19,7 @@ interface LoginProps {
 }
 
 function Login() {
-  const {setAuthenticated} = useContext(AuthContext)!;
+  const {setAuthenticated, setUid} = useContext(AuthContext)!;
   const [formFields, setFormFields] = useState(defaultFormFields)
   const { email, password } = formFields
   // const navigate = useNavigate()
